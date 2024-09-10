@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Website with Wallet Connections</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; box-sizing: border-box;">
+    <header style="background-color: aquamarine; padding: 20px 0; text-align: center;">
+        <h1 style="margin: 0; font-size: 2.5rem;">Hospital</h1>
+        <nav style="margin-top: 10px;">
+            <a href="home.html" style="text-decoration: none; color: black; font-weight: bold; margin: 0 15px;">Home</a>
+            <a href="service.html" style="text-decoration: none; color: black; font-weight: bold; margin: 0 15px;">Service</a>
+            <a href="facilities.html" style="text-decoration: none; color: black; font-weight: bold; margin: 0 15px;">Facilities</a>
+            <a href="specialties.html" style="text-decoration: none; color: black; font-weight: bold; margin: 0 15px;">Specialties</a>
+            <a href="contact.html" style="text-decoration: none; color: black; font-weight: bold; margin: 0 15px;">Contact</a>
+        </nav>
+    </header>
+    
+    <main style="padding: 20px;">
+        <!-- Kết nối ví Eternl -->
+        <div id="eternl-wallet-connect" style="margin: 20px 0; text-align: center;">
+            <button id="connect-eternl-wallet" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Connect Eternl Wallet</button>
+        </div>
+        <div id="eternl-wallet-info" style="text-align: center; color: green; font-weight: bold;"></div>
+
+        <!-- Kết nối ví MetaMask -->
+        <div id="metamask-wallet-connect" style="margin: 20px 0; text-align: center;">
+            <button id="connect-metamask-wallet" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Connect MetaMask Wallet</button>
+        </div>
+        <div id="metamask-wallet-info" style="text-align: center; color: green; font-weight: bold;"></div>
+    </main>
+
+    <footer style="background-color: antiquewhite; height: 60px; display: flex; justify-content: center; align-items: center;">
+        <p style="margin: 0; font-size: 0.9rem;">&copy; 2024 Hospital. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Thêm Mesh JS SDK từ CDN -->
+    <script src="https://unpkg.com/@meshsdk/core/dist/mesh.min.js"></script>
+
+    <!-- Script để kết nối với ví Eternl -->
+    <script>
+        document.getElementById('connect-eternl-wallet').addEventListener('click', async () => {
+            try {
+                if (window.cardano && window.cardano.eternl) {
+                    const walletApi = await window.cardano.eternl.enable();
+                    console.log('Eternl Wallet API:', walletApi); // In chi tiết API
+                    
+                    const addresses = await walletApi.getUsedAddresses();
+                    console.log('Eternl Addresses:', addresses); // In danh sách địa chỉ
+    
+                    if (addresses.length > 0) {
+                        const decodedAddress = addresses[0];
+                        document.getElementById('eternl-wallet-info').innerHTML = `
+                            <p>Wallet Connected: ${decodedAddress} </p>
+                            <p> đã kết nối ví<p>
+                        `;
+                        console.log("Connected to Eternl Wallet. Address:", decodedAddress);
+                    } else {
+                        document.getElementById('eternl-wallet-info').innerHTML = `
+                            <p style="color: red;">No addresses found. Please ensure your wallet has addresses.</p>
+                        `;
+                    }
+                } else {
+                    alert('Eternl Wallet is not available. Please install it and try again.');
+                    console.error('Eternl wallet is not available in window.cardano.');
+                }
+            } catch (error) {
+                console.error('Error connecting to Eternl wallet:', error);
+                document.getElementById('eternl-wallet-info').innerHTML = `
+                    <p style="color: red;">Failed to connect to Eternl wallet. Please try again.</p>
+                `;
+            }
+        });
+    </script>
+
+    <!-- Script để kết nối với ví MetaMask -->
+    <script>
+        document.getElementById('connect-metamask-wallet').addEventListener('click', async () => {
+            try {
+                if (window.ethereum) {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log('MetaMask Accounts:', accounts);
+
+                    if (accounts.length > 0) {
+                        const account = accounts[0];
+                        document.getElementById('metamask-wallet-info').innerHTML = `
+                            <p>MetaMask Wallet Connected: ${account}</p>
+                        `;
+                        console.log("Connected to MetaMask Wallet. Account:", account);
+                    } else {
+                        document.getElementById('metamask-wallet-info').innerHTML = `
+                            <p style="color: red;">No MetaMask accounts found.</p>
+                        `;
+                    }
+                } else {
+                    alert('MetaMask is not installed. Please install it and try again.');
+                    console.error('MetaMask is not available in window.ethereum.');
+                }
+            } catch (error) {
+                console.error('Error connecting to MetaMask:', error);
+                document.getElementById('metamask-wallet-info').innerHTML = `
+                    <p style="color: red;">Failed to connect to MetaMask. Please try again.</p>
+                `;
+            }
+        });
+    </script>
+
+</body>
+</html>
